@@ -1,0 +1,3 @@
+chatwork_token = ""
+slack_endpoint = "https://hooks.slack.com/services/..."
+slack_channel = "#general"
