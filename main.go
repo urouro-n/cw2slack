@@ -19,9 +19,15 @@ const AppVersion = "0.0.1"
 const BaseURL = "https://api.chatwork.com/v2"
 
 type Config struct {
-	ChatWorkToken string `toml:"chatwork_token"`
-	SlackEndpoint string `toml:"slack_endpoint"`
-	SlackChannel  string `toml:"slack_channel"`
+	ChatWorkToken       string `toml:"chatwork_token"`
+	SlackEndpoint       string `toml:"slack_endpoint"`
+	SlackDefaultChannel string `toml:"slack_channel"`
+	Mappings            map[string]ConfigMapping
+}
+
+type ConfigMapping struct {
+	Room    string
+	Channel string
 }
 
 type Room struct {
@@ -77,6 +83,15 @@ func action(c *cli.Context) error {
 	for _, r := range rooms {
 		messages := messages(r.RoomId)
 		if len(messages) > 0 {
+			channel := config.SlackDefaultChannel
+
+			for _, mapping := range config.Mappings {
+				mr, _ := strconv.Atoi(mapping.Room)
+				if mr == r.RoomId {
+					channel = mapping.Channel
+				}
+			}
+
 			for _, m := range messages {
 				url := "https://chatwork.com/#!rid/" + strconv.Itoa(r.RoomId) + "-" + m.MessageId
 				attachments := []SlackAttachment{SlackAttachment{
@@ -90,7 +105,7 @@ func action(c *cli.Context) error {
 				}}
 				postToSlack(Slack{
 					r.Name,
-					config.SlackChannel,
+					channel,
 					r.IconPath,
 					attachments,
 				})

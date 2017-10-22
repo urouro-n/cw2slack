@@ -1,3 +1,8 @@
 chatwork_token = ""
 slack_endpoint = "https://hooks.slack.com/services/..."
-slack_channel = "#general"
+slack_default_channel = "#general"
+
+[mappings]
+[mappings.example]
+room = ""
+channel = ""
